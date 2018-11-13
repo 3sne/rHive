@@ -1,11 +1,3 @@
-//
-//  LoginScreenVC.swift
-//  rHive
-//
-//  Created by Vinzy on 13/11/18.
-//  Copyright © 2018 M2V. All rights reserved.
-//
-
 import UIKit
 
 class LoginScreenVC: UIViewController {
@@ -18,30 +10,57 @@ class LoginScreenVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Do any additional setup after loading the view.
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     @IBAction func checkCredentials(_ sender: Any) {
-        if thisUser.username == username.text && thisUser.password == password.text {
-            performSegue(withIdentifier: "sL", sender: self)
-        } else {
-            //alert to tell invalid creds
+        guard let username = username.text, let password = password.text else { //case if handle/password is empty
+            print("[Debug] Nil entries for password/username")
+            return
         }
-    }
-    /*
-    // MARK: - Navigation
+        // let usernameRemote: String
+        // let passwordRemote: String
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
+        let url = URL(string: "https://asdfwhy.pythonanywhere.com/login")!
+        var request = URLRequest(url: url)
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        let postString = "handle=\(username)&rawpw=\(password)"
+        request.httpBody = postString.data(using: .utf8)
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data, error == nil else {                                                 // check for fundamental networking error
+                print("[Debug] error=\(error)")
+                return
+            }
 
+            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
+                print("[Debug] statusCode should be 200, but is \(httpStatus.statusCode)")
+                print("[Debug] response = \(response)")
+            }
+
+            let responseString = String(data: data, encoding: .utf8)
+            print("[Debug] responseString = \(responseString)")
+            if responseString == "-1" { //password not matched
+                //error routine
+                print("[Debug] Wrong Credentials")
+            } else { //extract json data to thisUser properties
+                print("[Debug] Login was successful")
+                performSegue(withIdentifier: "sL", sender: self)    
+            }
+
+        }
+        task.resume()
+
+        /*  NOTE:::: This code will be used if we resort to hard coded data/persistent data
+
+
+        if thisUser.username == username.text && thisUser.password == password.text { //enter the application if user authenticated 
+            performSegue(withIdentifier: "sL", sender: self)
+        } else { //alert to tell invalid creds
+        }
+        */
+    }
 }

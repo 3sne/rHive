@@ -1,11 +1,3 @@
-//
-//  SignUpVC.swift
-//  rHive
-//
-//  Created by Vinzy on 13/11/18.
-//  Copyright © 2018 M2V. All rights reserved.
-//
-
 import UIKit
 
 class SignUpVC: UIViewController {
@@ -36,11 +28,10 @@ class SignUpVC: UIViewController {
         signedUpUser = User(u: username.text, fn: firstName.text, ln: lastName.text, ps: password.text, em: email.text, pn: phoneNumber.text, ad: address.text)
         if let signedUpUser = signedUpUser {
             if password == vpassword { //Attempt to make new db entry
-                let url = URL(string: "https://asdfwhy.pythonanywhere.com/createAccount")!
+                let url = URL(string: "https://asdfwhy.pythonanywhere.com/register")!
                 var request = URLRequest(url: url)
                 request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
                 request.httpMethod = "POST"
-                let postString = "id=13&name=Jack"
                 let postString = "handle=\(u)&realname=\(fn)%20\(ln)&encPassword=\(ps)&email=\(em)&address=\(ad)&primaryPhone=\(pn)"
                 request.httpBody = postString.data(using: .utf8)
                 let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -70,16 +61,4 @@ class SignUpVC: UIViewController {
             print("[Debug] Empty Fields Error, all fields are compulsory")
         }
     }
-
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
