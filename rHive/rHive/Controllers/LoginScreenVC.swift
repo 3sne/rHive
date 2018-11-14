@@ -27,6 +27,17 @@ class LoginScreenVC: UIViewController {
         super.didReceiveMemoryWarning()
     }
     
+    func convertToDictionary(text: String) -> [String: String]? {
+        if let data = text.data(using: .utf8) {
+            do {
+                return try JSONSerialization.jsonObject(with: data, options: []) as? [String: String]
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        return nil
+    }
+    
     @IBAction func checkCredentials(_ sender: Any) {
         guard let username = username.text, let password = password.text else { //case if handle/password is empty
             print("[Debug] Nil entries for password/username")
@@ -94,8 +105,19 @@ class LoginScreenVC: UIViewController {
             }
             
         } else { //extract json data to thisUser properties
-            
+            print("[Debug] \(rString)")
             print("[Debug] Login was successful")
+            
+            let rAccount = convertToDictionary(text: rString)
+            print(rAccount!)
+            thisUser.username = (rAccount?["handle"])!
+            thisUser.realName = (rAccount?["realName"])!
+            thisUser.password = (rAccount?["rawpw"])!
+            thisUser.email = (rAccount?["email"])!
+            thisUser.address = (rAccount?["address"])!
+            thisUser.phoneNumber = (rAccount?["phone"])!
+            
+            print("\(thisUser.address)")
             self.performSegue(withIdentifier: "sL", sender: nil)
         }
         
