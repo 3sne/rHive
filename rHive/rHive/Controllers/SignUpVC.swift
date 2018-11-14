@@ -27,26 +27,26 @@ class SignUpVC: UIViewController {
     @IBAction func disThis(_ sender: Any) {
         signedUpUser = User(u: username.text, fn: firstName.text, ln: lastName.text, ps: password.text, em: email.text, pn: phoneNumber.text, ad: address.text)
         if let signedUpUser = signedUpUser {
-            if password == vpassword { //Attempt to make new db entry
+            if password.text == vpassword.text { //Attempt to make new db entry
                 let url = URL(string: "https://asdfwhy.pythonanywhere.com/register")!
                 var request = URLRequest(url: url)
                 request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
                 request.httpMethod = "POST"
-                let postString = "handle=\(u)&realname=\(fn)%20\(ln)&encPassword=\(ps)&email=\(em)&address=\(ad)&primaryPhone=\(pn)"
+                let postString = "handle=\(signedUpUser.username)&realname=\(signedUpUser.firstName)%20\(signedUpUser.lastName)&encPassword=\(signedUpUser.password)&email=\(signedUpUser.email)&address=\(signedUpUser.address)&primaryPhone=\(signedUpUser.phoneNumber)"
                 request.httpBody = postString.data(using: .utf8)
                 let task = URLSession.shared.dataTask(with: request) { data, response, error in
                     guard let data = data, error == nil else {                                                 // check for fundamental networking error
-                        print("[Debug] error=\(error)")
+                        print("[Debug] error=\(String(describing: error))")
                         return
                     }
 
                     if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
                         print("[Debug] statusCode should be 200, but is \(httpStatus.statusCode)")
-                        print("[Debug] response = \(response)")
+                        print("[Debug] response = \(String(describing: response))")
                     }
 
                     let responseString = String(data: data, encoding: .utf8)
-                    print("[Debug] responseString = \(responseString)")
+                    print("[Debug] responseString = \(String(describing: responseString))")
                 }
                 print("[Debug] Signup was successful")
                 task.resume()
@@ -60,5 +60,8 @@ class SignUpVC: UIViewController {
         } else { //error routine
             print("[Debug] Empty Fields Error, all fields are compulsory")
         }
+    }
+    @IBAction func goBack(_ sender: Any) {
+        self.dismiss(animated: true, completion: nil)
     }
 }
